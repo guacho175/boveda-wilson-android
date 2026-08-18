@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Exclusivo del APK de androidTest de :data:remote (ADR-037): esta prueba habla con el
+     Firebase Emulator Suite local. No es el :app real ni su NSC de producción/debug —
+     este módulo no tiene Application ni se distribuye — y usa la misma excepción ya
+     acotada en app/src/debug/res/xml/network_security_config.xml.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">localhost</domain>
+        <domain includeSubdomains="false">10.0.2.2</domain>
+    </domain-config>
+</network-security-config>

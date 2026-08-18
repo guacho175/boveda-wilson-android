@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Variante monocroma para iconos temáticos (Android 13+ / minSdk 33, ADR-027):
+     el sistema tiñe estas formas con el color de acento del usuario, así que solo
+     importa la silueta, no el color. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <group
+        android:name="orbit_back"
+        android:pivotX="54"
+        android:pivotY="54"
+        android:rotation="55">
+        <path
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="2"
+            android:strokeAlpha="0.45"
+            android:fillColor="#00000000"
+            android:pathData="M24,54 a30,10 0 1,0 60,0 a30,10 0 1,0 -60,0 Z" />
+    </group>
+
+    <group
+        android:name="orbit_front"
+        android:pivotX="54"
+        android:pivotY="54"
+        android:rotation="-20">
+        <path
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="2.6"
+            android:fillColor="#00000000"
+            android:pathData="M24,54 a30,13 0 1,0 60,0 a30,13 0 1,0 -60,0 Z" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M80,54 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0 Z" />
+    </group>
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M43,54 a11,11 0 1,0 22,0 a11,11 0 1,0 -22,0 Z" />
+
+</vector>

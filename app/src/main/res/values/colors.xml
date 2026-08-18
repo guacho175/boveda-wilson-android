@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Paleta oficial orbynex.digital v2 (`_fuente/manual_orbynex.html` §7). Solo se usa
+     aquí para el fondo de la ventana del sistema antes de que Compose tome el control
+     (evita un parpadeo blanco); la fuente de verdad de la paleta en la interfaz vive en
+     ui/theme/Theme.kt. -->
+<resources>
+    <color name="orbynex_deep_space">#FF071A3D</color>
+</resources>

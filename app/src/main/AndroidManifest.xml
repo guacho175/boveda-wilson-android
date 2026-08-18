@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- El MVP usa WorkManager solo para trabajos de red ordinarios, nunca servicios en
+         primer plano. BiometricPrompt en minSdk 33 usa USE_BIOMETRIC; el permiso heredado
+         USE_FINGERPRINT no corresponde a ningún dispositivo soportado. -->
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.USE_FINGERPRINT"
+        tools:node="remove" />
+
+    <application
+        android:name=".BovedaWilsonApp"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.BovedaWilson"
+        tools:targetApi="33">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.BovedaWilson">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- androidx.profileinstaller
+             llega transitivamente por activity-compose y se declara exported="true" con
+             permiso DUMP. El MVP no usa perfiles de referencia; se excluye para que solo
+             el launcher quede exportado (docs/architecture.md §6). Lint no resuelve la
+             clase de la librería para un nodo de solo-eliminación: se ignora MissingClass
+             para esta línea únicamente. -->
+        <receiver
+            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+            tools:node="remove"
+            tools:ignore="MissingClass" />
+
+        <!-- El receptor de diagnóstico de WorkManager solo permite acciones manuales de
+             depuración mediante adb. No forma parte del funcionamiento de sincronización
+             y se excluye de todas las variantes distribuibles. -->
+        <receiver
+            android:name="androidx.work.impl.diagnostics.DiagnosticsReceiver"
+            tools:node="remove"
+            tools:ignore="MissingClass" />
+
+        <!-- La configuración de WorkManager usa HiltWorkerFactory desde BovedaWilsonApp.
+             Se elimina únicamente su inicializador por defecto; AndroidX Startup conserva
+             sus demás inicializadores. -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                tools:node="remove" />
+        </provider>
+
+        <!-- Hallazgo ALTO de security-architect, Fase 4 (2026-07-31, ADR-037 extendido):
+             firebase-auth declara GenericIdpActivity, exported="true" sin permiso, para el
+             flujo de OAuthProvider genérico (proveedores federados no-Google: Yahoo,
+             Microsoft, Twitter, Apple). Este diseño solo implementa Google Sign-In por
+             intercambio de ID token (GoogleAuthProvider.getCredential, ver
+             FirebaseAuthSourceImpl.signInWithGoogleIdToken) y correo/contraseña
+             Solo se admite el proveedor Google configurado: nunca se usa OAuthProvider genérico, así que
+             este componente exportado sin permiso y sin uso real se excluye
+             (docs/architecture.md §6, SECURITY.md §6). Si una fase futura
+             añadiera un proveedor federado genérico, esta exclusión debe revisarse primero. -->
+        <activity
+            android:name="com.google.firebase.auth.internal.GenericIdpActivity"
+            tools:node="remove"
+            tools:ignore="MissingClass" />
+
+        <!-- RecaptchaActivity (firebase-auth) y RevocationBoundService
+             (play-services-auth) también llegan exported="true" con firebase-auth. Se
+             mantienen, a diferencia de GenericIdpActivity, porque sí corresponden al
+             diseño implementado (ADR-037 extendido, hallazgo ALTO de security-architect):
+             - RecaptchaActivity: verificación anti-abuso de Firebase Auth para el flujo de
+               correo/contraseña que sí se implementa; su intent-filter exige el esquema
+               exacto recaptcha://firebase.auth/, generado internamente por el propio SDK.
+             - RevocationBoundService: requerida por cualquier app que use Google Sign-In
+               (que este diseño sí usa); expuesta pero protegida por el permiso de firma
+               com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION,
+               que solo posee Google Play Services.
+             El permiso com.google.android.providers.gsf.permission.READ_GSERVICES llega
+             transitivamente de Play Services (lee configuración de Google Services
+             Framework; no expone datos del usuario) y no requiere exclusión. -->
+    </application>
+
+</manifest>

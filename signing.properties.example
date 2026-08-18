@@ -1,0 +1,6 @@
+# Copiar a una carpeta privada fuera del repositorio/OneDrive y completar solo allí.
+# Pasar su ruta absoluta con -Pboveda.signingProperties=... o BOVEDA_SIGNING_PROPERTIES.
+storeFile=C:\\RUTA_PRIVADA_FUERA_DEL_REPOSITORIO\\boveda-wilson-release.jks
+storePassword=REEMPLAZAR_LOCALMENTE
+keyAlias=REEMPLAZAR_LOCALMENTE
+keyPassword=REEMPLAZAR_LOCALMENTE

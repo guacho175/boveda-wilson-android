@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Nada de esta aplicación sale del dispositivo por copia de seguridad ni por
+  transferencia entre dispositivos. Se excluyen también los dominios de almacenamiento
+  protegido por dispositivo (device_*), porque `allowBackup="false"` gobierna la copia en
+  la nube pero la transferencia D2D se controla aquí (hallazgo M-9 de la Fase 1).
+  No verificado empíricamente: exige dos dispositivos; queda en el checklist manual.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="." />
+        <exclude domain="database" path="." />
+        <exclude domain="file" path="." />
+        <exclude domain="root" path="." />
+        <exclude domain="external" path="." />
+        <exclude domain="device_sharedpref" path="." />
+        <exclude domain="device_database" path="." />
+        <exclude domain="device_file" path="." />
+        <exclude domain="device_root" path="." />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="." />
+        <exclude domain="database" path="." />
+        <exclude domain="file" path="." />
+        <exclude domain="root" path="." />
+        <exclude domain="external" path="." />
+        <exclude domain="device_sharedpref" path="." />
+        <exclude domain="device_database" path="." />
+        <exclude domain="device_file" path="." />
+        <exclude domain="device_root" path="." />
+    </device-transfer>
+</data-extraction-rules>

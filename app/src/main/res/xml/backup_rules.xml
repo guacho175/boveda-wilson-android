@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Reglas para API 30 y anteriores (`fullBackupContent`). En este proyecto minSdk es 33,
+  así que gobierna `data_extraction_rules.xml`; este archivo se mantiene alineado para
+  que las dos declaraciones no se contradigan.
+-->
+<full-backup-content>
+    <exclude domain="sharedpref" path="." />
+    <exclude domain="database" path="." />
+    <exclude domain="file" path="." />
+    <exclude domain="root" path="." />
+    <exclude domain="external" path="." />
+    <exclude domain="device_sharedpref" path="." />
+    <exclude domain="device_database" path="." />
+    <exclude domain="device_file" path="." />
+    <exclude domain="device_root" path="." />
+</full-backup-content>

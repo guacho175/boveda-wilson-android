@@ -1,0 +1,23 @@
+config:
+  validation: true
+  warningsAsErrors: false
+
+naming:
+  FunctionNaming:
+    # Las funciones @Composable se nombran en PascalCase por convención oficial de
+    # Jetpack Compose. La regla por defecto de detekt asume camelCase y marcaría cada
+    # pantalla del proyecto.
+    ignoreAnnotated: ['Composable']
+
+style:
+  MagicNumber:
+    # Los literales de layout y de color en Compose (dp, 0xFF...) no son «números
+    # mágicos» en el sentido de la regla: son valores de diseño en su punto de uso.
+    ignoreAnnotated: ['Composable']
+    ignorePropertyDeclaration: true
+
+complexity:
+  LongMethod:
+    # Un @Composable de pantalla describe un árbol de UI; partirlo solo para bajar el
+    # conteo de líneas no lo hace más legible. Se mantiene el límite para el resto.
+    ignoreAnnotated: ['Composable']

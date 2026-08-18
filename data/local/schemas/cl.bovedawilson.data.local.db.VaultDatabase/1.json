@@ -1,0 +1,399 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "5132ca2c1e64f1650c9492e92c8bda30",
+    "entities": [
+      {
+        "tableName": "vault_meta",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`vaultId` TEXT NOT NULL, `ownerUid` TEXT NOT NULL, `schemaVersion` INTEGER NOT NULL, `cryptoVersion` INTEGER NOT NULL, `kdfName` TEXT NOT NULL, `kdfMemoryKib` INTEGER NOT NULL, `kdfIterations` INTEGER NOT NULL, `kdfParallelism` INTEGER NOT NULL, `kdfOutputLen` INTEGER NOT NULL, `passwordSalt` BLOB NOT NULL, `passwordWrappedVdek` BLOB NOT NULL, `recoverySalt` BLOB NOT NULL, `recoveryWrappedVdek` BLOB NOT NULL, `passwordWrapEpoch` INTEGER NOT NULL, `recoveryWrapEpoch` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, `metaRevision` INTEGER NOT NULL, PRIMARY KEY(`vaultId`))",
+        "fields": [
+          {
+            "fieldPath": "vaultId",
+            "columnName": "vaultId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ownerUid",
+            "columnName": "ownerUid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "schemaVersion",
+            "columnName": "schemaVersion",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cryptoVersion",
+            "columnName": "cryptoVersion",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kdfName",
+            "columnName": "kdfName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kdfMemoryKib",
+            "columnName": "kdfMemoryKib",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kdfIterations",
+            "columnName": "kdfIterations",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kdfParallelism",
+            "columnName": "kdfParallelism",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kdfOutputLen",
+            "columnName": "kdfOutputLen",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "passwordSalt",
+            "columnName": "passwordSalt",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "passwordWrappedVdek",
+            "columnName": "passwordWrappedVdek",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recoverySalt",
+            "columnName": "recoverySalt",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recoveryWrappedVdek",
+            "columnName": "recoveryWrappedVdek",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "passwordWrapEpoch",
+            "columnName": "passwordWrapEpoch",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recoveryWrapEpoch",
+            "columnName": "recoveryWrapEpoch",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "metaRevision",
+            "columnName": "metaRevision",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "vaultId"
+          ]
+        }
+      },
+      {
+        "tableName": "encrypted_items",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` TEXT NOT NULL, `ciphertext` BLOB NOT NULL, `cryptoVersion` INTEGER NOT NULL, `schemaVersion` INTEGER NOT NULL, `revision` INTEGER NOT NULL, `tombstone` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, `dirty` INTEGER NOT NULL, `lastSyncedRevision` INTEGER NOT NULL, `conflictOf` TEXT, `pendingRemoteCiphertext` BLOB, `pendingRemoteRevision` INTEGER, `pendingRemoteCryptoVersion` INTEGER, `pendingRemoteSchemaVersion` INTEGER, `pendingRemoteTombstone` INTEGER, `pendingRemoteCreatedAt` INTEGER, `pendingRemoteUpdatedAt` INTEGER, PRIMARY KEY(`itemId`))",
+        "fields": [
+          {
+            "fieldPath": "itemId",
+            "columnName": "itemId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ciphertext",
+            "columnName": "ciphertext",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cryptoVersion",
+            "columnName": "cryptoVersion",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "schemaVersion",
+            "columnName": "schemaVersion",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "revision",
+            "columnName": "revision",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tombstone",
+            "columnName": "tombstone",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updatedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dirty",
+            "columnName": "dirty",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastSyncedRevision",
+            "columnName": "lastSyncedRevision",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "conflictOf",
+            "columnName": "conflictOf",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "pendingRemoteCiphertext",
+            "columnName": "pendingRemoteCiphertext",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "pendingRemoteRevision",
+            "columnName": "pendingRemoteRevision",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "pendingRemoteCryptoVersion",
+            "columnName": "pendingRemoteCryptoVersion",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "pendingRemoteSchemaVersion",
+            "columnName": "pendingRemoteSchemaVersion",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "pendingRemoteTombstone",
+            "columnName": "pendingRemoteTombstone",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "pendingRemoteCreatedAt",
+            "columnName": "pendingRemoteCreatedAt",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "pendingRemoteUpdatedAt",
+            "columnName": "pendingRemoteUpdatedAt",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "itemId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_encrypted_items_dirty",
+            "unique": false,
+            "columnNames": [
+              "dirty"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_encrypted_items_dirty` ON `${TABLE_NAME}` (`dirty`)"
+          },
+          {
+            "name": "index_encrypted_items_tombstone",
+            "unique": false,
+            "columnNames": [
+              "tombstone"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_encrypted_items_tombstone` ON `${TABLE_NAME}` (`tombstone`)"
+          },
+          {
+            "name": "index_encrypted_items_updatedAt",
+            "unique": false,
+            "columnNames": [
+              "updatedAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_encrypted_items_updatedAt` ON `${TABLE_NAME}` (`updatedAt`)"
+          }
+        ]
+      },
+      {
+        "tableName": "pending_conflicts",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`itemId` TEXT NOT NULL, `detectedAt` INTEGER NOT NULL, `remoteRevision` INTEGER NOT NULL, PRIMARY KEY(`itemId`))",
+        "fields": [
+          {
+            "fieldPath": "itemId",
+            "columnName": "itemId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "detectedAt",
+            "columnName": "detectedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "remoteRevision",
+            "columnName": "remoteRevision",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "itemId"
+          ]
+        }
+      },
+      {
+        "tableName": "biometric_unlock",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `keyAlias` TEXT NOT NULL, `wrappedBiometricKek` BLOB NOT NULL, `biometricWrappedVdek` BLOB NOT NULL, `biometricWrapEpoch` INTEGER NOT NULL, `iv` BLOB NOT NULL, `strongBoxBacked` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "keyAlias",
+            "columnName": "keyAlias",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wrappedBiometricKek",
+            "columnName": "wrappedBiometricKek",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "biometricWrappedVdek",
+            "columnName": "biometricWrappedVdek",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "biometricWrapEpoch",
+            "columnName": "biometricWrapEpoch",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "iv",
+            "columnName": "iv",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "strongBoxBacked",
+            "columnName": "strongBoxBacked",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "sync_state",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `lastPullAt` INTEGER NOT NULL, `lastPushAt` INTEGER NOT NULL, `lastError` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastPullAt",
+            "columnName": "lastPullAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastPushAt",
+            "columnName": "lastPushAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastError",
+            "columnName": "lastError",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5132ca2c1e64f1650c9492e92c8bda30')"
+    ]
+  }
+}
