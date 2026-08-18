@@ -1,0 +1,107 @@
+# ---------------------------------------------------------------------------
+# Bóveda Wilson — .gitignore
+# Regla rectora: si un archivo puede contener material criptográfico, secretos
+# reales o configuración privada, NO entra al repositorio.
+# ---------------------------------------------------------------------------
+
+# --- Secretos y credenciales (NUNCA versionar) -----------------------------
+google-services.json
+!google-services.json.example
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pem
+*.key
+!**/*.key.example
+service-account*.json
+serviceAccount*.json
+*-service-account.json
+.env
+.env.*
+!.env.example
+keystore.properties
+signing.properties
+local.properties
+secrets.properties
+*.recovery
+*.mnemonic
+*.vaultbackup
+*.bwvault
+
+# --- Salidas de build ------------------------------------------------------
+build/
+*/build/
+**/build/
+.gradle/
+.kotlin/
+out/
+gen/
+*.apk
+*.aab
+*.aar
+*.ap_
+*.dex
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+captures/
+.cxx/
+
+# --- Android / IDE ---------------------------------------------------------
+.idea/
+!.idea/codeStyles/
+*.iml
+*.ipr
+*.iws
+.navigation/
+.externalNativeBuild/
+lint/tmp/
+lint-results*.html
+lint-results*.xml
+.DS_Store
+Thumbs.db
+
+# --- Node (suite de pruebas de Security Rules) -----------------------------
+node_modules/
+npm-debug.log*
+yarn-error.log*
+package-lock.json.bak
+
+# --- Firebase Emulator Suite ----------------------------------------------
+.firebase/
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+database-debug.log*
+firebase-export-*/
+emulator-data/
+
+# --- Artefactos de pruebas y reportes -------------------------------------
+*.hprof
+test-output/
+reports/
+**/reports/
+coverage/
+*.exec
+*.log
+!docs/**/*.log.example
+
+# --- Volcados que podrían contener material sensible ----------------------
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.dump
+*.bak
+logcat*.txt
+adb-*.txt
+heapdump*
+
+# --- OneDrive / sistema operativo -----------------------------------------
+*~
+~$*
+.tmp/
+tmp/
+scratch/
