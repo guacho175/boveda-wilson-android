@@ -1,0 +1,14 @@
+{
+  "name": "boveda-wilson-firestore-rules",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Suite de pruebas de las Security Rules de Bóveda Wilson contra el Firebase Emulator Suite. Solo desarrollo local; no se despliega nada desde aquí.",
+  "scripts": {
+    "test": "firebase emulators:exec --project demo-boveda-wilson-public-public --only auth,firestore \"node --test --test-concurrency=1 test/*.test.js\""
+  },
+  "devDependencies": {
+    "firebase": "12.17.1",
+    "firebase-tools": "15.26.0",
+    "@firebase/rules-unit-testing": "5.0.1"
+  }
+}

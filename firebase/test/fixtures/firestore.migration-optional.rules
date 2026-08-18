@@ -1,0 +1,61 @@
+rules_version = '2';
+
+// Variante de firestore.rules SOLO para test/migration_fixture.spec.js (G-58).
+// Añade 'migrationFixture' como campo OPCIONAL del documento de bóveda para probar que un
+// campo nuevo puede introducirse sin romper documentos existentes que no lo tienen, y que
+// sigue existiendo una lista cerrada (un campo ajeno no listado se sigue denegando).
+// No se despliega nunca; vive solo en el árbol de pruebas.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function vaultRequiredFields() {
+      return ['schemaVersion','cryptoVersion','kdfName','kdfMemoryKib','kdfIterations',
+              'kdfParallelism','kdfOutputLen','passwordSalt','passwordWrappedVdek',
+              'recoverySalt','recoveryWrappedVdek','passwordWrapEpoch','recoveryWrapEpoch',
+              'createdAt','updatedAt','metaRevision'];
+    }
+
+    function vaultOptionalFields() {
+      return ['migrationFixture'];
+    }
+
+    function validVault(d) {
+      return d.keys().hasOnly(vaultRequiredFields().concat(vaultOptionalFields()))
+          && d.keys().hasAll(vaultRequiredFields())
+          && d.schemaVersion is int && d.schemaVersion >= 1
+          && d.cryptoVersion is int && d.cryptoVersion >= 1
+          && d.kdfName is string && d.kdfName == 'argon2id'
+          && d.kdfMemoryKib is int && d.kdfMemoryKib == 65536
+          && d.kdfIterations is int && d.kdfIterations == 3
+          && d.kdfParallelism is int && d.kdfParallelism == 4
+          && d.kdfOutputLen is int && d.kdfOutputLen == 32
+          && d.passwordSalt is bytes && d.passwordSalt.size() == 16
+          && d.recoverySalt is bytes && d.recoverySalt.size() == 32
+          && d.passwordWrappedVdek is bytes && d.passwordWrappedVdek.size() > 0
+          && d.passwordWrappedVdek.size() <= 8192
+          && d.recoveryWrappedVdek is bytes && d.recoveryWrappedVdek.size() > 0
+          && d.recoveryWrappedVdek.size() <= 8192
+          && d.passwordWrapEpoch is int && d.passwordWrapEpoch >= 1
+          && d.recoveryWrapEpoch is int && d.recoveryWrapEpoch >= 1
+          && d.createdAt is int && d.createdAt > 0
+          && d.updatedAt is int && d.updatedAt >= d.createdAt
+          && d.updatedAt <= request.time.toMillis() + 300000
+          && d.metaRevision is int && d.metaRevision >= 1;
+    }
+
+    match /users/{uid}/vaults/{vaultId} {
+      allow get, list: if isOwner(uid);
+      allow create: if isOwner(uid) && validVault(request.resource.data);
+      allow update: if isOwner(uid) && validVault(request.resource.data);
+      allow delete: if isOwner(uid);
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

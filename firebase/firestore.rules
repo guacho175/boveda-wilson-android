@@ -1,0 +1,173 @@
+rules_version = '2';
+
+// Bóveda Wilson — Firestore Security Rules.
+// Diseño acordado en docs/architecture.md §6; probado exhaustivamente en firebase/test/
+// contra el Emulator Suite (Fase 4). Firebase nunca descifra nada: estas reglas solo
+// controlan quién puede leer o escribir ciphertext y metadatos no sensibles.
+// Denegación por defecto: cualquier ruta sin `allow` explícito queda cerrada.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function vaultRequiredFields() {
+      return ['schemaVersion','cryptoVersion','kdfName','kdfMemoryKib','kdfIterations',
+              'kdfParallelism','kdfOutputLen','passwordSalt','passwordWrappedVdek',
+              'recoverySalt','recoveryWrappedVdek','passwordWrapEpoch','recoveryWrapEpoch',
+              'createdAt','updatedAt','metaRevision'];
+    }
+
+    function vaultOptionalFields() {
+      return [];
+    }
+
+    function validVault(d) {
+      return d.keys().hasOnly(vaultRequiredFields().concat(vaultOptionalFields()))
+          && d.keys().hasAll(vaultRequiredFields())
+          && d.schemaVersion is int && d.schemaVersion >= 1
+          && d.cryptoVersion is int && d.cryptoVersion >= 1
+          && d.kdfName is string && d.kdfName == 'argon2id'
+          && d.kdfMemoryKib is int && d.kdfMemoryKib == 65536
+          && d.kdfIterations is int && d.kdfIterations == 3
+          && d.kdfParallelism is int && d.kdfParallelism == 4
+          && d.kdfOutputLen is int && d.kdfOutputLen == 32
+          && d.passwordSalt is bytes && d.passwordSalt.size() == 16
+          && d.recoverySalt is bytes && d.recoverySalt.size() == 32
+          && d.passwordWrappedVdek is bytes && d.passwordWrappedVdek.size() > 0
+          && d.passwordWrappedVdek.size() <= 8192
+          && d.recoveryWrappedVdek is bytes && d.recoveryWrappedVdek.size() > 0
+          && d.recoveryWrappedVdek.size() <= 8192
+          && d.passwordWrapEpoch is int && d.passwordWrapEpoch >= 1
+          && d.recoveryWrapEpoch is int && d.recoveryWrapEpoch >= 1
+          && d.createdAt is int && d.createdAt > 0
+          && d.updatedAt is int && d.updatedAt >= d.createdAt
+          && d.updatedAt <= request.time.toMillis() + 300000
+          && d.metaRevision is int && d.metaRevision >= 1;
+    }
+
+    function passwordWrapFieldsChanged() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasAny(
+        ['kdfName','kdfMemoryKib','kdfIterations','kdfParallelism','kdfOutputLen',
+         'passwordSalt','passwordWrappedVdek']
+      );
+    }
+
+    function recoveryWrapFieldsChanged() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasAny(
+        ['recoverySalt','recoveryWrappedVdek']
+      );
+    }
+
+    function validWrapEpochUpdate() {
+      return ((passwordWrapFieldsChanged()
+                 && request.resource.data.passwordWrapEpoch > resource.data.passwordWrapEpoch)
+              || (!passwordWrapFieldsChanged()
+                 && request.resource.data.passwordWrapEpoch == resource.data.passwordWrapEpoch))
+          && ((recoveryWrapFieldsChanged()
+                 && request.resource.data.recoveryWrapEpoch > resource.data.recoveryWrapEpoch)
+              || (!recoveryWrapFieldsChanged()
+                 && request.resource.data.recoveryWrapEpoch == resource.data.recoveryWrapEpoch));
+    }
+
+    function itemRequiredFields() {
+      return ['ciphertext','cryptoVersion','schemaVersion','revision','tombstone',
+              'createdAt','updatedAt'];
+    }
+
+    function itemOptionalFields() {
+      return [];
+    }
+
+    function validItem(d) {
+      return d.keys().hasOnly(itemRequiredFields().concat(itemOptionalFields()))
+          && d.keys().hasAll(itemRequiredFields())
+          && d.ciphertext is bytes && d.ciphertext.size() <= 262144
+          && ((d.tombstone == true && d.ciphertext.size() == 0)
+              || (d.tombstone == false && d.ciphertext.size() > 0))
+          && d.cryptoVersion is int && d.cryptoVersion >= 1
+          && d.schemaVersion is int && d.schemaVersion >= 1
+          && d.revision is int && d.revision >= 1
+          && d.tombstone is bool
+          && d.createdAt is int && d.createdAt > 0
+          && d.updatedAt is int && d.updatedAt >= d.createdAt
+          && d.updatedAt <= request.time.toMillis() + 300000;
+    }
+
+    function deletionMarkerRequiredFields() {
+      return ['schemaVersion', 'deletedAt'];
+    }
+
+    function validDeletionMarker(d) {
+      return d.keys().hasOnly(deletionMarkerRequiredFields())
+          && d.keys().hasAll(deletionMarkerRequiredFields())
+          && d.schemaVersion is int && d.schemaVersion == 1
+          && d.deletedAt is int && d.deletedAt > 0
+          && d.deletedAt <= request.time.toMillis() + 300000;
+    }
+
+    function vaultDeletionStarted(uid, vaultId) {
+      return exists(
+        /databases/$(database)/documents/users/$(uid)/deletedVaults/$(vaultId)
+      );
+    }
+
+    // El marcador es deliberadamente inmutable y persistente. Evita que otro
+    // cliente autenticado con el mismo uid recree documentos mientras una
+    // eliminacion remota esta en curso o despues de completarla.
+    match /users/{uid}/deletedVaults/{vaultId} {
+      allow get: if isOwner(uid);
+      // El propietario debe descubrir marcadores creados por otro dispositivo para
+      // reanudar la purga antes de adoptar o sincronizar la bóveda.
+      allow list: if isOwner(uid);
+      allow create: if isOwner(uid) && validDeletionMarker(request.resource.data);
+      allow update, delete: if false;
+    }
+
+    match /users/{uid}/vaults/{vaultId} {
+      allow get, list: if isOwner(uid);
+      allow create: if isOwner(uid)
+                    && !vaultDeletionStarted(uid, vaultId)
+                    && validVault(request.resource.data);
+      allow update: if isOwner(uid)
+                    && !vaultDeletionStarted(uid, vaultId)
+                    && validVault(request.resource.data)
+                    && request.resource.data.createdAt == resource.data.createdAt
+                    && request.resource.data.updatedAt >= resource.data.updatedAt
+                    && request.resource.data.metaRevision > resource.data.metaRevision
+                    && request.resource.data.cryptoVersion >= resource.data.cryptoVersion
+                    && request.resource.data.schemaVersion >= resource.data.schemaVersion
+                    && request.resource.data.kdfMemoryKib >= resource.data.kdfMemoryKib
+                    && request.resource.data.kdfIterations >= resource.data.kdfIterations
+                    && request.resource.data.kdfParallelism >= resource.data.kdfParallelism
+                    && request.resource.data.kdfOutputLen == resource.data.kdfOutputLen
+                    && validWrapEpochUpdate();
+      allow delete: if isOwner(uid) && vaultDeletionStarted(uid, vaultId);
+
+      match /items/{itemId} {
+        allow get, list: if isOwner(uid);
+        allow create: if isOwner(uid)
+                      && !vaultDeletionStarted(uid, vaultId)
+                      && validItem(request.resource.data)
+                      && request.resource.data.revision >= 1;
+        allow update: if isOwner(uid) && validItem(request.resource.data)
+                      && request.resource.data.createdAt == resource.data.createdAt
+                      && request.resource.data.updatedAt >= resource.data.updatedAt
+                      && request.resource.data.revision > resource.data.revision
+                      && request.resource.data.cryptoVersion >= resource.data.cryptoVersion
+                      && request.resource.data.schemaVersion >= resource.data.schemaVersion
+                      && (!vaultDeletionStarted(uid, vaultId)
+                          || (request.resource.data.tombstone == true
+                              && request.resource.data.ciphertext.size() == 0));
+        allow delete: if isOwner(uid)
+                      && vaultDeletionStarted(uid, vaultId);
+      }
+    }
+
+    match /{document=**} {
+      // Documental: Firestore ya deniega por defecto toda ruta sin allow.
+      allow read, write: if false;
+    }
+  }
+}
